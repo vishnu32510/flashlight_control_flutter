@@ -1,0 +1,147 @@
+# Fastlane → TestFlight, Play Internal/Production, or App Store submit.
+# Push to main: uploads Android Internal testing (android_internal) automatically.
+# Manual dispatch: pick any lane (iOS still requires CI signing certs/profiles).
+# iOS CI signing: you must add certificates/profiles (e.g. fastlane match) or flutter build ipa will fail on CI.
+# Android: release signing via secrets (see README).
+name: Store release (Fastlane)
+
+concurrency:
+  group: store-release-${{ github.ref }}
+  cancel-in-progress: false
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      lane:
+        description: "Fastlane lane to run"
+        required: true
+        type: choice
+        options:
+          - ios_beta
+          - ios_submit_review
+          - android_internal
+          - android_production
+
+env:
+  LC_ALL: en_US.UTF-8
+  LANG: en_US.UTF-8
+
+jobs:
+  ios:
+    if: ${{ github.event_name == 'workflow_dispatch' && startsWith(inputs.lane, 'ios_') }}
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Install gems (root Gemfile)
+        run: bundle install
+
+      - name: Validate iOS release secrets
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
+        run: |
+          test -n "$APP_STORE_CONNECT_KEY_ID" || (echo "Missing APP_STORE_CONNECT_KEY_ID" && exit 1)
+          test -n "$APP_STORE_CONNECT_ISSUER_ID" || (echo "Missing APP_STORE_CONNECT_ISSUER_ID" && exit 1)
+          test -n "$APP_STORE_CONNECT_KEY_CONTENT" || (echo "Missing APP_STORE_CONNECT_KEY_CONTENT" && exit 1)
+
+      - name: Run Fastlane (iOS)
+        working-directory: ios
+        env:
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
+          APP_STORE_CONNECT_KEY_IS_BASE64: "1"
+        run: |
+          if [ "${{ inputs.lane }}" = "ios_beta" ]; then
+            bundle exec fastlane beta
+          else
+            bundle exec fastlane submit_review
+          fi
+
+  android:
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && startsWith(inputs.lane, 'android_')) }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Install gems (root Gemfile)
+        run: bundle install
+
+      - name: Validate Android release secrets
+        env:
+          PLAY_JSON_B64: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON_B64 }}
+          KS_B64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_B64 }}
+          SP: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          KP: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          test -n "$PLAY_JSON_B64" || (echo "Missing PLAY_SERVICE_ACCOUNT_JSON_B64" && exit 1)
+          test -n "$KS_B64" || (echo "Missing ANDROID_UPLOAD_KEYSTORE_B64" && exit 1)
+          test -n "$SP" || (echo "Missing ANDROID_STORE_PASSWORD" && exit 1)
+          test -n "$KP" || (echo "Missing ANDROID_KEY_PASSWORD" && exit 1)
+          test -n "$ALIAS" || (echo "Missing ANDROID_KEY_ALIAS" && exit 1)
+
+      - name: Write Android upload keystore and key.properties
+        env:
+          ANDROID_UPLOAD_KEYSTORE_B64: ${{ secrets.ANDROID_UPLOAD_KEYSTORE_B64 }}
+          ANDROID_STORE_PASSWORD: ${{ secrets.ANDROID_STORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: |
+          mkdir -p keystore
+          echo "$ANDROID_UPLOAD_KEYSTORE_B64" | base64 -d > keystore/upload-keystore.jks
+          {
+            echo "storePassword=${ANDROID_STORE_PASSWORD}"
+            echo "keyPassword=${ANDROID_KEY_PASSWORD}"
+            echo "keyAlias=${ANDROID_KEY_ALIAS}"
+            echo "storeFile=../../keystore/upload-keystore.jks"
+          } > android/key.properties
+
+      - name: Write Play service account JSON
+        env:
+          PLAY_JSON_B64: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON_B64 }}
+        run: |
+          echo "$PLAY_JSON_B64" | base64 -d > "${{ runner.temp }}/play.json"
+
+      - name: Run Fastlane (Android)
+        working-directory: android
+        env:
+          PLAY_SERVICE_ACCOUNT_JSON_PATH: ${{ runner.temp }}/play.json
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            bundle exec fastlane internal
+          elif [ "${{ inputs.lane }}" = "android_internal" ]; then
+            bundle exec fastlane internal
+          else
+            bundle exec fastlane production
+          fi

@@ -1,0 +1,8 @@
+# App Store Connect app identifier (matches Xcode Runner target).
+app_identifier("com.vn.flashlightControl")
+
+# Apple Developer Team ID (from Xcode → Signing & Capabilities).
+team_id("KU4MTZR6YX")
+
+# Optional: Apple ID used for legacy login flows (prefer API key in CI).
+# apple_id("you@example.com")
