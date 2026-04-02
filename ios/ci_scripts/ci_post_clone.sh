@@ -1,24 +1,25 @@
 #!/bin/sh
-# Xcode Cloud — runs after the repository is cloned. Installs Flutter and CocoaPods deps.
-# Configure the workflow in Xcode: Report navigator → Cloud, or https://developer.apple.com/xcode-cloud/
+
+# Fail this script if any subcommand fails.
 set -e
 
-cd "${CI_PRIMARY_REPOSITORY_PATH:-.}"
+cd $CI_PRIMARY_REPOSITORY_PATH
 
-# Install Flutter SDK (stable).
-git clone https://github.com/flutter/flutter.git --depth 1 -b stable "${HOME}/flutter"
-export PATH="${PATH}:${HOME}/flutter/bin"
+# Install Flutter using git.
+git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter
+export PATH="$PATH:$HOME/flutter/bin"
 
+# Install Flutter artifacts for iOS.
 flutter precache --ios
+
+# Install Flutter dependencies.
 flutter pub get
 
-# CocoaPods (Xcode Cloud macOS images).
-export HOMEBREW_NO_AUTO_UPDATE=1
-if ! command -v pod >/dev/null 2>&1; then
-  brew install cocoapods
-fi
+# Install CocoaPods using Homebrew.
+HOMEBREW_NO_AUTO_UPDATE=1
+brew install cocoapods
 
-cd ios
-pod install --repo-update
+# Install CocoaPods dependencies.
+cd ios && pod install
 
 exit 0

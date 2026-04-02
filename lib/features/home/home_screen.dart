@@ -1,10 +1,12 @@
 import 'package:flashlight_control/core/di/injection.dart';
+import 'package:flashlight_control/core/services/flashlight_control_service.dart';
 import 'package:flashlight_control/core/services/toast_service.dart';
+import 'package:flashlight_control/features/home/widgets/home_body.dart';
 import 'package:flashlight_control/features/theme/theme.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:torch_light/torch_light.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,118 +16,72 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _isOn = false;
+  late final FlashlightControlService _flash;
 
-  Future<void> _toggleTorch() async {
-    final toast = getIt<IToastService>();
+  @override
+  void initState() {
+    super.initState();
+    _flash = FlashlightControlService(toast: getIt<IToastService>());
+  }
 
-    try {
-      if (_isOn) {
-        await TorchLight.disableTorch();
-        if (mounted) setState(() => _isOn = false);
-        return;
-      }
+  @override
+  void dispose() {
+    _flash.dispose();
+    super.dispose();
+  }
 
-      await TorchLight.enableTorch();
-      if (mounted) setState(() => _isOn = true);
-    } on EnableTorchExistentUserException {
-      toast.showWarning('Torch is already enabled.');
-      if (mounted) setState(() => _isOn = true);
-    } on DisableTorchExistentUserException {
-      toast.showWarning('Torch is already disabled.');
-      if (mounted) setState(() => _isOn = false);
-    } on EnableTorchNotAvailableException {
-      toast.showError('Torch is not available on this device.');
-    } on EnableTorchException catch (_) {
-      toast.showError('Could not enable torch.');
-    } on DisableTorchException catch (_) {
-      toast.showError('Could not disable torch.');
-    } catch (_) {
-      toast.showError('Torch action failed.');
+  Future<void> _onMainTap() async {
+    final outcome = await _flash.handleMainTap();
+    switch (outcome) {
+      case TorchMainTapOutcome.stoppedEffects:
+        HapticFeedback.lightImpact();
+        break;
+      case TorchMainTapOutcome.turnedOn:
+        HapticFeedback.mediumImpact();
+        break;
+      case TorchMainTapOutcome.turnedOff:
+        HapticFeedback.lightImpact();
+        break;
+      case TorchMainTapOutcome.unchanged:
+        break;
+    }
+  }
+
+  void _onStrobeTap() {
+    _flash.toggleStrobe();
+    HapticFeedback.selectionClick();
+  }
+
+  Future<void> _onSosTap() async {
+    final outcome = await _flash.toggleSos();
+    switch (outcome) {
+      case TorchSosOutcome.started:
+        HapticFeedback.heavyImpact();
+        break;
+      case TorchSosOutcome.stopped:
+        HapticFeedback.lightImpact();
+        break;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-    final background = theme.scaffoldBackgroundColor;
-    final raised = colors.surface;
-    final onSurface = colors.onSurface;
-    final shadow = theme.shadowColor;
 
     return Scaffold(
-      backgroundColor: background,
-      body: Center(
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 220),
-          curve: Curves.easeOutCubic,
-          width: 180,
-          height: 180,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: raised,
-            boxShadow: [
-              if (_isOn)
-                BoxShadow(
-                  color: onSurface.withValues(alpha: 0.6),
-                  blurRadius: 52,
-                  spreadRadius: 6,
-                ),
-              BoxShadow(
-                color: shadow.withValues(alpha: 0.55),
-                offset: Offset(14, 14),
-                blurRadius: 28,
-              ),
-              BoxShadow(
-                color: onSurface.withValues(alpha: 0.13),
-                offset: Offset(-10, -10),
-                blurRadius: 20,
-              ),
-            ],
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              customBorder: const CircleBorder(),
-              onTap: _toggleTorch,
-              child: Center(
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.easeOut,
-                  width: 112,
-                  height: 112,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: colors.surfaceContainerHighest,
-                    border: Border.all(
-                      color:
-                          _isOn
-                              ? onSurface.withValues(alpha: 0.8)
-                              : onSurface.withValues(alpha: 0.48),
-                      width: _isOn ? 2 : 2.4,
-                    ),
-                    boxShadow:
-                        _isOn
-                            ? [
-                              BoxShadow(
-                                color: onSurface.withValues(alpha: 0.7),
-                                blurRadius: 36,
-                                spreadRadius: 2,
-                              ),
-                            ]
-                            : const [],
-                  ),
-                  child: Icon(
-                    Icons.power_settings_new_rounded,
-                    size: 44,
-                    color:
-                        _isOn ? onSurface : onSurface.withValues(alpha: 0.72),
-                  ),
-                ),
-              ),
-            ),
-          ),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      body: SafeArea(
+        child: ListenableBuilder(
+          listenable: _flash,
+          builder: (context, _) {
+            return HomeBody(
+              theme: theme,
+              flash: _flash,
+              onMainTap: _onMainTap,
+              onStrobeTap: _onStrobeTap,
+              onSosTap: _onSosTap,
+            );
+          },
         ),
       ),
       floatingActionButton:
