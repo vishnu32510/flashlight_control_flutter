@@ -90,7 +90,7 @@ Fastlane **match** stores the Distribution certificate and App Store provisionin
    ```
    Follow the prompts (passphrase becomes `MATCH_PASSWORD`). Commit and push are handled by match.
 
-**GitHub Actions** (workflow **iOS beta** or **both** lanes) add repository secrets:
+**GitHub Actions** (workflow **Store release (iOS)** → `ios_beta` or `ios_submit_review`) add repository secrets:
 
 | Secret | Purpose |
 |--------|---------|
@@ -112,4 +112,5 @@ Root `Gemfile` pins Fastlane. Lanes live under `ios/fastlane` and `android/fastl
 - **Android** (from repo root): `cd android && bundle exec fastlane internal` or `bundle exec fastlane production`  
   Set `PLAY_SERVICE_ACCOUNT_JSON_PATH` to your Play Console service account JSON (example: copy it to `android/play-service-account.json`, gitignored) and configure release signing.
 
-CI workflow: `.github/workflows/store_release.yml` — **push to `main`** runs **Android Internal** (`fastlane internal`); use **Actions → Run workflow** to pick TestFlight, App Store submit, or Android production.
+CI workflows: `.github/workflows/store_release_android.yml` — **push to `main`** runs **Android Internal** (`fastlane internal`); **Actions → Run workflow** can pick **Android** internal or production.  
+`.github/workflows/store_release_ios.yml` — **Actions → Run workflow** only: **TestFlight** (`ios_beta`) or **App Store submit** (`ios_submit_review`). To ship both platforms close together, run **Store release (Android)** and **Store release (iOS)** from the Actions tab (they run independently).

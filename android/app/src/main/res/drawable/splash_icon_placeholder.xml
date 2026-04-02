@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Same fill as splash_background so Android 12+ circular icon mask is invisible. -->
+<!-- Same fill as splash_background so Android 12+ splash shows no contrasting icon. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="48dp"
     android:height="48dp"
     android:viewportWidth="48"
     android:viewportHeight="48">
     <path
-        android:fillColor="#FF36E2FF"
+        android:fillColor="#FF1A1A29"
         android:pathData="M0,0h48v48h-48z" />
 </vector>
