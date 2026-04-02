@@ -76,7 +76,17 @@ For **GitHub Actions** Android lanes (`android_internal`, `android_production`),
 
 The workflow writes `keystore/upload-keystore.jks` and `android/key.properties` on the runner before Fastlane runs.
 
-### iOS signing (match + TestFlight / CI)
+### Xcode Cloud (iOS)
+
+`ios/ci_scripts/ci_post_clone.sh` installs Flutter (stable), runs `flutter pub get`, and `pod install` on Apple’s runners—same idea as the plushie template, without Firebase/env steps.
+
+1. Open **`ios/Runner.xcworkspace`** in Xcode.
+2. **Report navigator** → **Cloud** (or [Xcode Cloud](https://developer.apple.com/xcode-cloud/)) → create a workflow: archive the **Runner** scheme, distribute to **TestFlight** (or App Store) as you prefer.
+3. Enable **Automatically manage signing** for the Runner target so Xcode Cloud can sign without GitHub `MATCH_*` secrets.
+
+GitHub **does not** run the iOS Fastlane workflow on push; use Xcode Cloud for continuous iOS builds, or trigger **Store release (iOS)** manually when you want Fastlane on GitHub Actions.
+
+### iOS signing (match + TestFlight / GitHub Actions)
 
 Fastlane **match** stores the Distribution certificate and App Store provisioning profile in a **private** Git repository. The `beta` lane runs `match` (readonly) on CI when `MATCH_PASSWORD` is set, then switches the Xcode project to manual signing for the archive.
 
@@ -113,4 +123,4 @@ Root `Gemfile` pins Fastlane. Lanes live under `ios/fastlane` and `android/fastl
   Set `PLAY_SERVICE_ACCOUNT_JSON_PATH` to your Play Console service account JSON (example: copy it to `android/play-service-account.json`, gitignored) and configure release signing.
 
 CI workflows: `.github/workflows/store_release_android.yml` — **push to `main`** runs **Android Internal** (`fastlane internal`); **Actions → Run workflow** can pick **Android** internal or production.  
-`.github/workflows/store_release_ios.yml` — **push to `main`** runs **TestFlight** (`fastlane beta`); **Actions → Run workflow** can pick **TestFlight** (`ios_beta`) or **App Store submit** (`ios_submit_review`). Android and iOS workflows both run on pushes to `main` (independently).
+`.github/workflows/store_release_ios.yml` — **Actions → Run workflow** only (no push): **TestFlight** (`ios_beta`) or **App Store submit** (`ios_submit_review`). Use **Xcode Cloud** for iOS builds on every branch/merge without GitHub signing secrets.
