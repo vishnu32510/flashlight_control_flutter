@@ -23,10 +23,11 @@ class HomeBody extends StatelessWidget {
     final colors = theme.colorScheme;
     final raised = colors.surface;
     final onSurface = colors.onSurface;
-    final shadow = theme.shadowColor;
-    final iconOn = onSurface.withValues(alpha: 0.92);
+    // Glows read as light — fixed white halos, not theme onSurface/shadow.
+    const glowWhite = Color(0xFFFFFFFF);
+    final iconOn = glowWhite.withValues(alpha: 0.95);
     final iconOff = onSurface.withValues(alpha: 0.7);
-    final borderOn = onSurface.withValues(alpha: 0.88);
+    final borderOn = glowWhite.withValues(alpha: 0.85);
     final borderOff = onSurface.withValues(alpha: 0.52);
     final bottomPad = MediaQuery.paddingOf(context).bottom;
 
@@ -54,17 +55,18 @@ class HomeBody extends StatelessWidget {
             boxShadow: [
               if (isOn)
                 BoxShadow(
-                  color: onSurface.withValues(alpha: 0.6),
+                  color: glowWhite.withValues(alpha: 0.62),
                   blurRadius: 52,
                   spreadRadius: 6,
                 ),
+              // Soft depth (off); white highlight top-left, subtle dark lower-right.
               BoxShadow(
-                color: shadow.withValues(alpha: 0.55),
+                color: Colors.black.withValues(alpha: 0.28),
                 offset: const Offset(14, 14),
                 blurRadius: 28,
               ),
               BoxShadow(
-                color: onSurface.withValues(alpha: 0.13),
+                color: glowWhite.withValues(alpha: 0.14),
                 offset: const Offset(-10, -10),
                 blurRadius: 20,
               ),
@@ -96,7 +98,7 @@ class HomeBody extends StatelessWidget {
                           isOn
                               ? [
                                 BoxShadow(
-                                  color: onSurface.withValues(alpha: 0.72),
+                                  color: glowWhite.withValues(alpha: 0.75),
                                   blurRadius: 36,
                                   spreadRadius: 2,
                                 ),

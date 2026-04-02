@@ -4,7 +4,7 @@ extension AppColors on ColorScheme {
   static Color white = const Color(0xffffffff);
   static Color lightColor = const Color(0xffcccccc);
   static Color lowPriority = const Color(0xff848191);
-  static Color primaryColor = const Color(0xff000000);
+  static Color primaryColor = const Color(0xffffffff);
   static Color secondaryColor = const Color(0xffbb86fc);
   static Color darkColor = const Color(0xff000000);
   static Color scaffoldColor = const Color(0xff000000);
