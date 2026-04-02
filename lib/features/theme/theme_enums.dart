@@ -28,5 +28,4 @@ extension ThemeTypeDetails on ThemeType {
         return Icons.sync_sharp;
     }
   }
-
 }

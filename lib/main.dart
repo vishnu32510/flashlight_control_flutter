@@ -12,11 +12,7 @@ Future<void> main() async {
   Bloc.observer = SimpleBlocObserver();
   setupDI();
 
-  runApp(
-    const ThemeWrapper(
-      child: FlashlightApp(),
-    ),
-  );
+  runApp(const ThemeWrapper(child: FlashlightApp()));
 }
 
 class FlashlightApp extends StatelessWidget {

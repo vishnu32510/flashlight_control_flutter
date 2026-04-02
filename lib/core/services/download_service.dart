@@ -21,7 +21,8 @@ class DownloadService extends Services {
 
   static Future<String> save(Uint8List bytes) async {
     final dir = await _getDir();
-    final path = '${dir.path}/download_${DateTime.now().millisecondsSinceEpoch}.png';
+    final path =
+        '${dir.path}/download_${DateTime.now().millisecondsSinceEpoch}.png';
     await File(path).writeAsBytes(bytes);
     await _addToIndex(path);
     return path;
@@ -33,8 +34,9 @@ class DownloadService extends Services {
 
     if (index == null) {
       final entities = await dir.list().toList();
-      final files = entities.whereType<File>().where((f) => !_isIndexFile(f)).toList()
-        ..sort((a, b) => b.path.compareTo(a.path));
+      final files =
+          entities.whereType<File>().where((f) => !_isIndexFile(f)).toList()
+            ..sort((a, b) => b.path.compareTo(a.path));
       await _writeIndex(files.map((f) => f.path).toList());
       return files;
     }

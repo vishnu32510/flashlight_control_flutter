@@ -99,25 +99,28 @@ class _HomeScreenState extends State<HomeScreen> {
                     shape: BoxShape.circle,
                     color: colors.surfaceContainerHighest,
                     border: Border.all(
-                      color: _isOn
-                          ? onSurface.withValues(alpha: 0.8)
-                          : onSurface.withValues(alpha: 0.48),
+                      color:
+                          _isOn
+                              ? onSurface.withValues(alpha: 0.8)
+                              : onSurface.withValues(alpha: 0.48),
                       width: _isOn ? 2 : 2.4,
                     ),
-                    boxShadow: _isOn
-                        ? [
-                            BoxShadow(
-                              color: onSurface.withValues(alpha: 0.7),
-                              blurRadius: 36,
-                              spreadRadius: 2,
-                            ),
-                          ]
-                        : const [],
+                    boxShadow:
+                        _isOn
+                            ? [
+                              BoxShadow(
+                                color: onSurface.withValues(alpha: 0.7),
+                                blurRadius: 36,
+                                spreadRadius: 2,
+                              ),
+                            ]
+                            : const [],
                   ),
                   child: Icon(
                     Icons.power_settings_new_rounded,
                     size: 44,
-                    color: _isOn ? onSurface : onSurface.withValues(alpha: 0.72),
+                    color:
+                        _isOn ? onSurface : onSurface.withValues(alpha: 0.72),
                   ),
                 ),
               ),
@@ -125,20 +128,22 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      floatingActionButton: kDebugMode
-          ? FloatingActionButton(
-              tooltip: 'Toggle theme',
-              onPressed: () {
-                final bloc = context.read<ThemeBloc>();
-                final current = bloc.state.themeEventType;
-                final next = current == ThemeType.darkMode
-                    ? ThemeType.lightMode
-                    : ThemeType.darkMode;
-                bloc.add(ThemeEventChange(next));
-              },
-              child: const Icon(Icons.brightness_6_outlined),
-            )
-          : null,
+      floatingActionButton:
+          kDebugMode
+              ? FloatingActionButton(
+                tooltip: 'Toggle theme',
+                onPressed: () {
+                  final bloc = context.read<ThemeBloc>();
+                  final current = bloc.state.themeEventType;
+                  final next =
+                      current == ThemeType.darkMode
+                          ? ThemeType.lightMode
+                          : ThemeType.darkMode;
+                  bloc.add(ThemeEventChange(next));
+                },
+                child: const Icon(Icons.brightness_6_outlined),
+              )
+              : null,
     );
   }
 }

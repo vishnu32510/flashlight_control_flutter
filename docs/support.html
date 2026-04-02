@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Support | Flashlight Control</title>
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --card: #111111;
+        --text: #f2f2f2;
+        --muted: #b8b8b8;
+        --accent: #ffffff;
+        --border: #2a2a2a;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        line-height: 1.6;
+      }
+      main {
+        max-width: 860px;
+        margin: 32px auto;
+        padding: 0 20px;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+      }
+      h1, h2 { line-height: 1.25; margin-top: 0; }
+      h1 { font-size: 2rem; margin-bottom: 0.25rem; }
+      h2 { margin-top: 1.5rem; }
+      p, li { color: var(--muted); }
+      a { color: var(--accent); }
+      .meta { font-size: 0.95rem; color: var(--muted); margin-bottom: 1rem; }
+      .help {
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 12px;
+        background: #161616;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <article class="card">
+        <h1>Support</h1>
+        <p class="meta">Flashlight Control help center</p>
+
+        <p>
+          Need help with Flashlight Control? Reach out for crash reports, flashlight availability issues,
+          or feature requests.
+        </p>
+
+        <h2>Contact</h2>
+        <p>
+          Email:
+          <a href="mailto:vishnu32510@gmail.com">vishnu32510@gmail.com</a>
+        </p>
+        <p>Typical response time: 1-3 business days.</p>
+
+        <h2>What to include in your message</h2>
+        <ul>
+          <li>Your device model and OS version.</li>
+          <li>App version.</li>
+          <li>What action you performed before the issue happened.</li>
+          <li>Screenshots or screen recording if relevant.</li>
+        </ul>
+
+        <h2>Quick FAQ</h2>
+        <section class="help">
+          <strong>Torch not turning on</strong>
+          <p>Check whether another app is using the camera/flash and retry.</p>
+        </section>
+
+        <section class="help">
+          <strong>Torch not available</strong>
+          <p>Some devices or emulators do not expose flashlight hardware.</p>
+        </section>
+
+        <section class="help">
+          <strong>Theme toggle button missing</strong>
+          <p>The floating theme button is shown only in debug builds.</p>
+        </section>
+      </article>
+    </main>
+  </body>
+</html>

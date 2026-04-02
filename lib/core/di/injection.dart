@@ -21,9 +21,8 @@ void setupDI() {
   getIt.registerLazySingleton<HttpServices>(() => HttpServices());
 
   getIt.registerLazySingleton<IToastService>(
-    () => ToastService(
-      messengerKey: getIt<GlobalKey<ScaffoldMessengerState>>(),
-    ),
+    () =>
+        ToastService(messengerKey: getIt<GlobalKey<ScaffoldMessengerState>>()),
   );
 
   getIt.registerFactory<ThemeBloc>(() => ThemeBloc());
