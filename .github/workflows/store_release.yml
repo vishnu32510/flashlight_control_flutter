@@ -54,6 +54,8 @@ jobs:
           gem install cocoapods
           echo "$(ruby -e 'puts Gem.user_dir')/bin" >> "$GITHUB_PATH"
           pod --version
+          # Generates ios/Flutter/Generated.xcconfig (required by Podfile)
+          flutter pub get
           cd ios
           pod install --repo-update
 

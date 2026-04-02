@@ -1,6 +1,10 @@
+<p align="center">
+  <img src="assets/icons/app_icon.png" alt="FlashLight Control icon" width="128" height="128" />
+</p>
+
 # flashlight_control
 
-Simple Flutter flashlight app scaffold with a clean, reusable architecture:
+Simple flashlight app scaffold with a clean, reusable architecture:
 
 - `core/` for config, DI, services, and shared utils
 - `features/` for feature modules (currently `home` and `theme`)
