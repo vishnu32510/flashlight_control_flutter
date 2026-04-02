@@ -28,10 +28,7 @@ class DarkThemeState extends ThemeState {
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primaryColor,
         brightness: Brightness.dark,
-      ).copyWith(
-        primary: AppColors.primaryColor,
-        onPrimary: Colors.black,
-      ),
+      ).copyWith(primary: AppColors.primaryColor, onPrimary: Colors.black),
       scaffoldBackgroundColor: AppColors.scaffoldColor,
     ),
     themeMode: ThemeMode.dark,
@@ -51,10 +48,7 @@ class LightThemeState extends ThemeState {
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primaryColor,
         brightness: Brightness.light,
-      ).copyWith(
-        primary: AppColors.primaryColor,
-        onPrimary: Colors.black,
-      ),
+      ).copyWith(primary: AppColors.primaryColor, onPrimary: Colors.black),
       scaffoldBackgroundColor: Colors.white,
     ),
     themeMode: ThemeMode.light,
@@ -74,10 +68,7 @@ class SystemThemeState extends ThemeState {
       colorScheme: ColorScheme.fromSeed(
         seedColor: AppColors.primaryColor,
         brightness: Brightness.dark,
-      ).copyWith(
-        primary: AppColors.primaryColor,
-        onPrimary: Colors.black,
-      ),
+      ).copyWith(primary: AppColors.primaryColor, onPrimary: Colors.black),
       scaffoldBackgroundColor: AppColors.scaffoldColor,
     ),
     themeMode: ThemeMode.system,
