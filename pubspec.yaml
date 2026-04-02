@@ -27,6 +27,7 @@ dependencies:
 
   # Network / utilities
   http: ^1.2.1
+  torch_light: ^1.1.0
   url_launcher: ^6.3.2
   cupertino_icons: ^1.0.8
 

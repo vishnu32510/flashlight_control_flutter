@@ -46,8 +46,8 @@ class SystemThemeState extends ThemeState {
       {required super.themeData, required super.themeMode, required super.themeEventType});
 
   static ThemeState get systemTheme => ThemeState(
-      themeData: ThemeData.light(useMaterial3: true).copyWith(
-        colorScheme: const ColorScheme.light(),
+      themeData: ThemeData.dark(useMaterial3: true).copyWith(
+        colorScheme: const ColorScheme.dark(),
       ),
       themeMode: ThemeMode.system,
       themeEventType: ThemeType.system);
