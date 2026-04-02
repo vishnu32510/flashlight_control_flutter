@@ -1,5 +1,6 @@
-# Fastlane → TestFlight, or App Store submit (metadata only).
-# Manual dispatch only. iOS: fastlane match (readonly) + App Store Connect API key.
+# Fastlane → TestFlight (push to main or ios_beta), or App Store submit (metadata only).
+# Push/merge to main runs TestFlight (`fastlane beta`) like Android internal on main.
+# iOS: fastlane match (readonly) + App Store Connect API key.
 # Add GitHub secrets: MATCH_GIT_URL, MATCH_PASSWORD, optional MATCH_GIT_BASIC_AUTHORIZATION (private HTTPS clone).
 name: Store release (iOS)
 
@@ -8,6 +9,9 @@ concurrency:
   cancel-in-progress: false
 
 on:
+  push:
+    branches:
+      - main
   workflow_dispatch:
     inputs:
       lane:
@@ -61,7 +65,7 @@ jobs:
           test -n "$APP_STORE_CONNECT_KEY_CONTENT" || (echo "Missing APP_STORE_CONNECT_KEY_CONTENT" && exit 1)
 
       - name: Validate iOS match secrets (TestFlight only)
-        if: ${{ inputs.lane == 'ios_beta' }}
+        if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.lane == 'ios_beta') }}
         env:
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
@@ -80,7 +84,7 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
         run: |
-          if [ "${{ inputs.lane }}" = "ios_beta" ]; then
+          if [ "${{ github.event_name }}" = "push" ] || [ "${{ inputs.lane }}" = "ios_beta" ]; then
             bundle exec fastlane beta
           else
             bundle exec fastlane submit_review
