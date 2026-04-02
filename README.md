@@ -84,6 +84,6 @@ Root `Gemfile` pins Fastlane. Lanes live under `ios/fastlane` and `android/fastl
 - **iOS** (from repo root): `cd ios && bundle exec fastlane beta` or `bundle exec fastlane submit_review`  
   Set App Store Connect API key env vars (`APP_STORE_CONNECT_KEY_ID`, `APP_STORE_CONNECT_ISSUER_ID`, and either `APP_STORE_CONNECT_KEY_PATH` or `APP_STORE_CONNECT_KEY_CONTENT`).
 - **Android** (from repo root): `cd android && bundle exec fastlane internal` or `bundle exec fastlane production`  
-  Set `PLAY_SERVICE_ACCOUNT_JSON_PATH` to your Play Console service account JSON and configure release signing.
+  Set `PLAY_SERVICE_ACCOUNT_JSON_PATH` to your Play Console service account JSON (example: copy it to `android/play-service-account.json`, gitignored) and configure release signing.
 
 CI workflow: `.github/workflows/store_release.yml` — **push to `main`** runs **Android Internal** (`fastlane internal`); use **Actions → Run workflow** to pick TestFlight, App Store submit, or Android production.

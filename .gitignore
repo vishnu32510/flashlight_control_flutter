@@ -52,6 +52,7 @@ app.*.map.json
 
 # Signing / credentials (never commit in public repos)
 android/key.properties
+android/play-service-account.json
 android/**/*.jks
 android/**/*.keystore
 /keystore/
