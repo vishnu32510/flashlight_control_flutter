@@ -1,17 +1,54 @@
 # flashlight_control
 
-A new Flutter project.
+Simple Flutter flashlight app scaffold with a clean, reusable architecture:
 
-## Getting Started
+- `core/` for config, DI, services, and shared utils
+- `features/` for feature modules (currently `home` and `theme`)
+- `get_it` dependency injection setup in `core/di/injection.dart`
+- `go_router` route setup in `core/config/routes.dart`
+- `flutter_bloc` for theme state management
 
-This project is a starting point for a Flutter application.
+This app currently has **no Firebase** and **no authentication**.
 
-A few resources to get you started if this is your first Flutter project:
+## Project Structure
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+```text
+lib/
+  core/
+    config/
+    di/
+    services/
+    utils/
+  features/
+    home/
+    theme/
+  main.dart
+```
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Run
+
+```bash
+flutter pub get
+flutter run
+```
+
+## Quality Check
+
+```bash
+flutter analyze
+```
+
+## Store Releases (Fastlane)
+
+Fastlane setup is available for iOS and Android releases:
+
+- `ios/fastlane/`
+- `android/fastlane/`
+- root `Gemfile`
+
+Example commands:
+
+```bash
+cd ios && bundle exec fastlane beta
+cd android && bundle exec fastlane internal
+```
