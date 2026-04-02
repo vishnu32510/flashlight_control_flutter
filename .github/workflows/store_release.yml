@@ -1,6 +1,7 @@
 # Fastlane → TestFlight, Play Internal/Production, or App Store submit.
 # Push to main: uploads Android Internal testing (android_internal) automatically.
-# Manual dispatch: pick any lane (iOS still requires CI signing certs/profiles).
+# Manual dispatch: pick any lane. Use `both` to run iOS beta + Android internal in parallel.
+# iOS still requires CI signing certs/profiles for `ios_*` / `both`.
 # iOS CI signing: you must add certificates/profiles (e.g. fastlane match) or flutter build ipa will fail on CI.
 # Android: release signing via secrets (see README).
 name: Store release (Fastlane)
@@ -20,6 +21,7 @@ on:
         required: true
         type: choice
         options:
+          - both
           - ios_beta
           - ios_submit_review
           - android_internal
@@ -31,7 +33,7 @@ env:
 
 jobs:
   ios:
-    if: ${{ github.event_name == 'workflow_dispatch' && startsWith(inputs.lane, 'ios_') }}
+    if: ${{ github.event_name == 'workflow_dispatch' && (inputs.lane == 'both' || startsWith(inputs.lane, 'ios_')) }}
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -77,14 +79,14 @@ jobs:
           APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
           APP_STORE_CONNECT_KEY_IS_BASE64: "1"
         run: |
-          if [ "${{ inputs.lane }}" = "ios_beta" ]; then
+          if [ "${{ inputs.lane }}" = "ios_beta" ] || [ "${{ inputs.lane }}" = "both" ]; then
             bundle exec fastlane beta
           else
             bundle exec fastlane submit_review
           fi
 
   android:
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && startsWith(inputs.lane, 'android_')) }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && (inputs.lane == 'both' || startsWith(inputs.lane, 'android_'))) }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -150,7 +152,7 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" = "push" ]; then
             bundle exec fastlane internal
-          elif [ "${{ inputs.lane }}" = "android_internal" ]; then
+          elif [ "${{ inputs.lane }}" = "android_internal" ] || [ "${{ inputs.lane }}" = "both" ]; then
             bundle exec fastlane internal
           else
             bundle exec fastlane production
