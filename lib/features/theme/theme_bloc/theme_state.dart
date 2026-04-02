@@ -24,9 +24,7 @@ class DarkThemeState extends ThemeState {
   });
 
   static ThemeState get darkTheme => ThemeState(
-    themeData: ThemeData.dark(
-      useMaterial3: true,
-    ).copyWith(
+    themeData: ThemeData.dark(useMaterial3: true).copyWith(
       colorScheme: const ColorScheme.dark(),
       scaffoldBackgroundColor: AppColors.scaffoldColor,
     ),
@@ -59,9 +57,7 @@ class SystemThemeState extends ThemeState {
   });
 
   static ThemeState get systemTheme => ThemeState(
-    themeData: ThemeData.dark(
-      useMaterial3: true,
-    ).copyWith(
+    themeData: ThemeData.dark(useMaterial3: true).copyWith(
       colorScheme: const ColorScheme.dark(),
       scaffoldBackgroundColor: AppColors.scaffoldColor,
     ),
