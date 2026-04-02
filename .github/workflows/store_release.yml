@@ -1,8 +1,8 @@
 # Fastlane → TestFlight, Play Internal/Production, or App Store submit.
 # Push to main: uploads Android Internal testing (android_internal) automatically.
 # Manual dispatch: pick any lane. Use `both` to run iOS beta + Android internal in parallel.
-# iOS still requires CI signing certs/profiles for `ios_*` / `both`.
-# iOS CI signing: you must add certificates/profiles (e.g. fastlane match) or flutter build ipa will fail on CI.
+# iOS TestFlight (`ios_beta` / `both`): fastlane match (readonly) + App Store Connect API key.
+# Add GitHub secrets: MATCH_GIT_URL, MATCH_PASSWORD, optional MATCH_GIT_BASIC_AUTHORIZATION (private HTTPS clone).
 # Android: release signing via secrets (see README).
 name: Store release (Fastlane)
 
@@ -71,6 +71,15 @@ jobs:
           test -n "$APP_STORE_CONNECT_ISSUER_ID" || (echo "Missing APP_STORE_CONNECT_ISSUER_ID" && exit 1)
           test -n "$APP_STORE_CONNECT_KEY_CONTENT" || (echo "Missing APP_STORE_CONNECT_KEY_CONTENT" && exit 1)
 
+      - name: Validate iOS match secrets (TestFlight / both lanes only)
+        if: ${{ inputs.lane == 'ios_beta' || inputs.lane == 'both' }}
+        env:
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+        run: |
+          test -n "$MATCH_GIT_URL" || (echo "Missing MATCH_GIT_URL (private git URL for fastlane match)" && exit 1)
+          test -n "$MATCH_PASSWORD" || (echo "Missing MATCH_PASSWORD (match encryption passphrase)" && exit 1)
+
       - name: Run Fastlane (iOS)
         working-directory: ios
         env:
@@ -78,6 +87,9 @@ jobs:
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_KEY_CONTENT: ${{ secrets.APP_STORE_CONNECT_KEY_CONTENT }}
           APP_STORE_CONNECT_KEY_IS_BASE64: "1"
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
         run: |
           if [ "${{ inputs.lane }}" = "ios_beta" ] || [ "${{ inputs.lane }}" = "both" ]; then
             bundle exec fastlane beta
