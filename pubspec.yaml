@@ -2,7 +2,7 @@ name: flashlight_control
 description: "Flashlight control template with DI + theming"
 publish_to: 'none'
 
-version: 1.1.0+7
+version: 1.0.0+7
 
 environment:
   sdk: ^3.7.2
